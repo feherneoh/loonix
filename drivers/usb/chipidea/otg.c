@@ -125,7 +125,7 @@ enum ci_role ci_otg_role(struct ci_hdrc *ci)
 		? CI_ROLE_GADGET
 		: CI_ROLE_HOST;
 
-	return role;
+	return CI_ROLE_GADGET; //role;
 }
 
 void ci_handle_vbus_change(struct ci_hdrc *ci)
@@ -169,7 +169,7 @@ static void ci_handle_id_switch(struct ci_hdrc *ci)
 	enum ci_role role = ci_otg_role(ci);
 
 	if (role != ci->role) {
-		dev_dbg(ci->dev, "switching from %s to %s\n",
+		dev_warn(ci->dev, "switching from %s to %s\n",
 			ci_role(ci)->name, ci->roles[role]->name);
 
 		if (ci->vbus_active && ci->role == CI_ROLE_GADGET)
