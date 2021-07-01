@@ -1,0 +1,325 @@
+// SPDX-License-Identifier: GPL-2.0
+#include <dt-bindings/input/input.h>
+
+#include "qcom-msm8930.dtsi"
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
+
+/ {
+    model = "Nokia Lumia 520 (fame)";
+    compatible = "qcom,msm8930", "qcom,msm8627", "qcom,msm8627-mtp", "qcom,msm8227";
+
+	aliases {
+		serial0 = &gsbi5_serial;
+	};
+
+	chosen {
+		//bootargs = "cma=64m"; //from nicki@Konrad
+		stdout-path = "serial0:115200n8";
+	};
+
+    soc {
+		rpm@108000 {
+			regulators {
+				compatible = "qcom,rpm-pm8038-regulators";
+
+				vin_lvs1-supply = <&pm8038_l11>; //Konrad doesn't have this on nicki
+				vin_lvs2-supply = <&pm8038_l11>; //Konrad doesn't have this on nicki
+
+				vdd_l7_l11_Ll21_l23-supply	= <&pm8038_s4>;		//Lumia 520 Schemantics
+				vdd_l1-supply				= <&pm8038_s2>;		//Lumia 520 Schemantics
+				vdd_l2_l20-supply			= <&pm8038_s2>;		//Lumia 520 Schemantics
+				vdd_l12_l24_l26-supply		= <&pm8038_s2>;		//Lumia 520 Schemantics
+				vdd_l16_l19-supply			= <&pm8038_s3>;		//Lumia 520 Schemantics
+				vdd_l27-supply				= <&pm8038_s3>;		//Lumia 520 Schemantics
+				// vdd_l8?
+				// others on vph_pwr
+
+				/* Core 1.15V */
+				pm8038_s1: s1 {
+					regulator-min-microvolt = <500000>;
+					regulator-max-microvolt = <1150000>;
+					qcom,switch-mode-frequency = <4800000>;
+					bias-pull-down;
+					qcom,force-mode = <QCOM_RPM_FORCE_MODE_LPM>; //Konrad doesn't have this on nicki
+				};
+
+				/* 1.4V */
+				pm8038_s2: s2 {
+					regulator-always-on;
+					regulator-min-microvolt = <1400000>;
+					regulator-max-microvolt = <1400000>;
+					qcom,switch-mode-frequency = <1600000>;
+					bias-pull-down;
+					qcom,force-mode = <QCOM_RPM_FORCE_MODE_LPM>; //Konrad doesn't have this on nicki
+				};
+
+				/* 1.15V */
+				pm8038_s3: s3 {
+					regulator-min-microvolt = <1150000>;
+					regulator-max-microvolt = <1150000>;
+					qcom,switch-mode-frequency = <3200000>;
+					bias-pull-down;
+					qcom,force-mode = <QCOM_RPM_FORCE_MODE_AUTO>; //Konrad doesn't have this on nicki
+				};
+
+				/* 2.2V */
+				pm8038_s4: s4 {
+					regulator-always-on;
+					regulator-min-microvolt = <2200000>; //was 1950000, Konrad bumped it up on nicki
+					regulator-max-microvolt = <2200000>;
+					qcom,switch-mode-frequency = <1600000>;
+					bias-pull-down;
+					qcom,force-mode = <QCOM_RPM_FORCE_MODE_LPM>; //Konrad doesn't have this on nicki
+				};
+
+				/* RF_CWS 1.3V */
+				pm8038_l1: l1 {
+					regulator-min-microvolt = <1300000>;
+					regulator-max-microvolt = <1300000>;
+					bias-pull-down;
+				};
+
+				/* MIPI 1.2V */
+				pm8038_l2: l2 {
+					regulator-min-microvolt = <1200000>;
+					regulator-max-microvolt = <1200000>;
+					bias-pull-down;
+
+					regulator-system-load = <100000>; //from nicki@Konrad
+					regulator-allow-set-load; //from nicki@Konrad
+				};
+
+				/* USB 3.075V (3.3V?) */
+				pm8038_l3: l3 {
+					regulator-min-microvolt = <3075000>;
+					regulator-max-microvolt = <3075000>;
+					bias-pull-down;
+				};
+
+				/* USB 1.8V */
+				pm8038_l4: l4 {
+					regulator-always-on;
+					regulator-min-microvolt = <1800000>;
+					regulator-max-microvolt = <1800000>;
+					bias-pull-down;
+
+					regulator-system-load = <10000>; //from nicki@Konrad
+					regulator-allow-set-load; //from nicki@Konrad
+				};
+
+				/* eMMC 2.95V */
+				pm8038_l5: l5 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <2950000>;
+					regulator-max-microvolt = <2950000>;
+					bias-pull-down;
+				};
+
+				/* SD 2.95V */
+				pm8038_l6: l6 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <2950000>;
+					regulator-max-microvolt = <2950000>;
+					bias-pull-down;
+				};
+
+				/* RF 2.05V */
+				pm8038_l7: l7 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <2050000>;
+					regulator-max-microvolt = <2050000>;
+					bias-pull-down;
+				};
+
+				/* LCD 2.8V */
+				pm8038_l8: l8 {
+					regulator-always-on; // lcm //from nicki@Konrad
+					regulator-min-microvolt = <2800000>;
+					regulator-max-microvolt = <2800000>;
+					bias-pull-down;
+
+					regulator-system-load = <100000>; //from nicki@Konrad
+					regulator-allow-set-load; //from nicki@Konrad
+				};
+
+				/* CAMVANA 2.85V */
+				pm8038_l9: l9 {
+					regulator-always-on;
+					regulator-min-microvolt = <2850000>;
+					regulator-max-microvolt = <2850000>;
+					bias-pull-down;
+				};
+
+				/* CWS 3V */
+				pm8038_l10: l10 {
+					regulator-min-microvolt = <2900000>;
+					regulator-max-microvolt = <3000000>; //Konrad limited this to 2900000 on nicki
+					bias-pull-down;
+				};
+
+				/* IO 1.8V */
+				pm8038_l11: l11 {
+					regulator-always-on;
+					regulator-min-microvolt = <1800000>;
+					regulator-max-microvolt = <1800000>;
+					bias-pull-down;
+
+					regulator-system-load = <100000>; //from nicki@Konrad
+					regulator-allow-set-load; //from nicki@Konrad
+				};
+
+				/* 1.2V */
+				pm8038_l12: l12 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <1200000>;
+					regulator-max-microvolt = <1200000>;
+					bias-pull-down;
+				};
+
+				/* PLL2 1.8V */
+				pm8038_l14: l14 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <1800000>;
+					regulator-max-microvolt = <1800000>;
+					bias-pull-down;
+				};
+
+				/* USIM1 2.95V */
+				pm8038_l15: l15 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <1800000>;
+					regulator-max-microvolt = <2950000>;
+					bias-pull-down;
+				};
+
+				/* DSPMSW */
+				pm8038_l16: l16 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <375000>;
+					regulator-max-microvolt = <1050000>;
+					bias-pull-down;
+				};
+
+				/* USIM2 / sensors 2.95V */
+				pm8038_l17: l17 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <1800000>;
+					regulator-max-microvolt = <2950000>;
+					bias-pull-down;
+				};
+
+				/* IO / RFFE 1.8 */
+				pm8038_l18: l18 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <1800000>;
+					regulator-max-microvolt = <1800000>;
+					bias-pull-down;
+				};
+
+				/* DSPMFW */
+				pm8038_l19: l19 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <375000>;
+					regulator-max-microvolt = <1050000>;
+					bias-pull-down;
+				};
+
+				/* DDRCORE 1.25V */
+				pm8038_l20: l20 { //Konrad doesn't have this on nicki
+					regulator-always-on;
+					regulator-min-microvolt = <1250000>;
+					regulator-max-microvolt = <1250000>;
+					bias-pull-down;
+				};
+
+				/* 1.9V */
+				pm8038_l21: l21 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <1900000>;
+					regulator-max-microvolt = <1900000>;
+					bias-pull-down;
+				};
+
+				/* SDC3 2.95V */
+				pm8038_l22: l22 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <1850000>;
+					regulator-max-microvolt = <2950000>;
+					bias-pull-down;
+				};
+
+				/* PLL2 1.8V */
+				pm8038_l23: l23 {
+					regulator-always-on;
+					// ss? //from nicki@Konrad
+					regulator-min-microvolt = <1800000>;
+					regulator-max-microvolt = <1800000>;
+					bias-pull-down;
+				};
+
+				/* MEM 1.15V */
+				pm8038_l24: l24 {
+					// ss?
+					regulator-min-microvolt = <500000>;
+					regulator-max-microvolt = <1150000>;
+					bias-pull-down;
+
+					regulator-system-load = <10000>; //from nicki@Konrad
+					regulator-allow-set-load; //from nicki@Konrad
+				};
+
+				/* PXO 1.05V */
+				pm8038_l26: l26 { //Konrad doesn't have this on nicki
+					regulator-always-on;
+					regulator-min-microvolt = <1050000>;
+					regulator-max-microvolt = <1050000>;
+					bias-pull-down;
+				};
+
+				/* DSPAPP 1.05V */
+				pm8038_l27: l27 { //Konrad doesn't have this on nicki
+					regulator-min-microvolt = <375000>;
+					regulator-max-microvolt = <1050000>;
+					bias-pull-down;
+				};
+
+				/* Q-Fuse 1.8V */
+				pm8038_lvs1: lvs1 {
+					bias-pull-down;
+				};
+
+				pm8038_lvs2: lvs2 { //not on the schematic
+					regulator-always-on;
+					bias-pull-down;
+				};
+
+				//usb-switch {}; //from nicki@Konrad
+
+				/*corner { //from nicki@Konrad
+					regulator-always-on;
+					// regulator-boot-on;
+					regulator-min-microvolt = <3>;
+					regulator-max-microvolt = <3>;
+				};*/
+			};
+		};
+
+		riva-pil@3204000 { //from nicki@Konrad
+			status = "okay";
+
+			pinctrl-names = "default";
+			pinctrl-0 = <&riva_wlan_pin_a>, <&riva_bt_pin_a>, <&riva_fm_pin_a>;
+		};
+
+        //gsbi@16400000 {}; //for some reason I have turned this on in the old port
+    };
+};
+
+&tlmm_gpio {
+	riva_fm_pin_a: riva-fm-active {
+		pins = "gpio26", "gpio27";
+		function = "fm";
+	};
+
+	riva_bt_pin_a: riva-bt-active {
+		pins = "gpio28", "gpio29", "gpio83"; // 1 extra ?
+		function = "bt";
+	};
+
+	riva_wlan_pin_a: riva-wlan-active {
+		pins = "gpio84", "gpio85", "gpio86", "gpio87", "gpio88";
+		function = "wlan";
+
+		drive-strength = <6>;
+		bias-pull-down;
+	};
+};
