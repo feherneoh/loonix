@@ -5,20 +5,20 @@
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
 
-/*
-missing: https://gitlab.com/postmarketOS/pmaports/issues/184
-*/
-
 / {
-	model = "Xperia M";
-	compatible = "qcom,msm8930", "qcom,msm8627", "qcom,msm8627-mtp", "qcom,msm8227";
+    model = "Lumia 520";
+    compatible = "qcom,msm8930", "qcom,msm8627", "qcom,msm8627-mtp", "qcom,msm8227";
+
+	aliases {
+		serial0 = &gsbi5_serial;
+	};
 
 	chosen {
-		bootargs = "cma=64m";
+		//bootargs = "cma=64m"; //from nicki@Konrad
 		stdout-path = "serial0:115200n8";
 	};
 
-	soc {
+    soc {
 		rpm@108000 {
 			regulators {
 				compatible = "qcom,rpm-pm8038-regulators";
@@ -30,46 +30,57 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 				vdd_l16_l19-supply = <&pm8038_s3>;
 				vdd_l27-supply = <&pm8038_s3>;
 				vdd_l7_l11_l21_l23-supply = <&pm8038_s4>;
-				vin_lvs-supply = <&pm8038_l11>;
+				vin_lvs1-supply = <&pm8038_l11>;			//Konrad has these merged on nicki
+				vin_lvs2-supply = <&pm8038_l11>;			//Konrad has these merged on nicki
 				// vdd_l8?
 				// others on vph_pwr
 
+				/* Core 1.15V */
 				s1 {
 					regulator-min-microvolt = <500000>;
 					regulator-max-microvolt = <1150000>;
 					qcom,switch-mode-frequency = <4800000>;
 					bias-pull-down;
+					//qcom,force-mode = <QCOM_RPM_FORCE_MODE_LPM>; //Konrad doesn't have this on nicki
 				};
 
+				/* 1.4V */
 				s2 {
 					regulator-always-on;
 					regulator-min-microvolt = <1400000>;
 					regulator-max-microvolt = <1400000>;
 					qcom,switch-mode-frequency = <1600000>;
 					bias-pull-down;
+					//qcom,force-mode = <QCOM_RPM_FORCE_MODE_LPM>; //Konrad doesn't have this on nicki
 				};
 
+				/* 1.15V */
 				s3 {
 					regulator-min-microvolt = <1150000>;
 					regulator-max-microvolt = <1150000>;
 					qcom,switch-mode-frequency = <3200000>;
 					bias-pull-down;
+					//qcom,force-mode = <QCOM_RPM_FORCE_MODE_AUTO>; //Konrad doesn't have this on nicki
 				};
 
+				/* 2.2V */
 				s4 {
 					regulator-always-on;
-					regulator-min-microvolt = <2200000>; // 1950000
+					regulator-min-microvolt = <2200000>; //was 1950000, Konrad bumped it up on nicki
 					regulator-max-microvolt = <2200000>;
 					qcom,switch-mode-frequency = <1600000>;
 					bias-pull-down;
+					//qcom,force-mode = <QCOM_RPM_FORCE_MODE_LPM>; //Konrad doesn't have this on nicki
 				};
 
+				/* RF_CWS 1.3V */
 				l1 {
 					regulator-min-microvolt = <1300000>;
 					regulator-max-microvolt = <1300000>;
 					bias-pull-down;
 				};
 
+				/* MIPI 1.2V */
 				l2 {
 					regulator-min-microvolt = <1200000>;
 					regulator-max-microvolt = <1200000>;
@@ -79,12 +90,14 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 					regulator-allow-set-load;
 				};
 
+				/* USB 3.075V (3.3V?) */
 				l3 {
 					regulator-min-microvolt = <3075000>;
 					regulator-max-microvolt = <3075000>;
 					bias-pull-down;
 				};
 
+				/* USB 1.8V */
 				l4 {
 					regulator-always-on;
 					regulator-min-microvolt = <1800000>;
@@ -95,30 +108,28 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 					regulator-allow-set-load;
 				};
 
-				/*
+				/* eMMC 2.95V */
 				l5 {
 					regulator-min-microvolt = <2950000>;
 					regulator-max-microvolt = <2950000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* SD 2.95V */
 				l6 {
 					regulator-min-microvolt = <2950000>;
 					regulator-max-microvolt = <2950000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* RF 2.05V */
 				l7 {
 					regulator-min-microvolt = <2050000>;
 					regulator-max-microvolt = <2050000>;
 					bias-pull-down;
 				};
-				*/
 
+				/* LCD 2.8V */
 				l8 {
 					regulator-always-on; // lcm
 					regulator-min-microvolt = <2800000>;
@@ -129,19 +140,22 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 					regulator-allow-set-load;
 				};
 
+				/* CAMVANA 2.85V */
 				l9 {
-					regulator-always-on; // accel + proxim, ts
+					regulator-always-on;
 					regulator-min-microvolt = <2850000>;
 					regulator-max-microvolt = <2850000>;
 					bias-pull-down;
 				};
 
+				/* CWS 3V */
 				l10 {
 					regulator-min-microvolt = <2900000>;
-					regulator-max-microvolt = <2900000>;
+					regulator-max-microvolt = <3000000>; //Konrad limited this to 2900000 on nicki
 					bias-pull-down;
 				};
 
+				/* IO 1.8V */
 				l11 {
 					regulator-always-on;
 					regulator-min-microvolt = <1800000>;
@@ -152,87 +166,78 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 					regulator-allow-set-load;
 				};
 
-				/*
+				/* 1.2V */
 				l12 {
 					regulator-min-microvolt = <1200000>;
 					regulator-max-microvolt = <1200000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* PLL2 1.8V */
 				l14 {
 					regulator-min-microvolt = <1800000>;
 					regulator-max-microvolt = <1800000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* USIM1 2.95V */
 				l15 {
 					regulator-min-microvolt = <1800000>;
 					regulator-max-microvolt = <2950000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* DSPMSW */
 				l16 {
 					regulator-min-microvolt = <375000>;
 					regulator-max-microvolt = <1050000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* USIM2 / sensors 2.95V */
 				l17 {
 					regulator-min-microvolt = <1800000>;
 					regulator-max-microvolt = <2950000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* IO / RFFE 1.8 */
 				l18 {
 					regulator-min-microvolt = <1800000>;
 					regulator-max-microvolt = <1800000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* DSPMFW */
 				l19 {
 					regulator-min-microvolt = <375000>;
 					regulator-max-microvolt = <1050000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* DDRCORE 1.25V */
 				l20 {
 					regulator-always-on;
 					regulator-min-microvolt = <1250000>;
 					regulator-max-microvolt = <1250000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* 1.9V */
 				l21 {
 					regulator-min-microvolt = <1900000>;
 					regulator-max-microvolt = <1900000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* SDC3 2.95V */
 				l22 {
 					regulator-min-microvolt = <1850000>;
 					regulator-max-microvolt = <2950000>;
 					bias-pull-down;
 				};
-				*/
 
+				/* PLL2 1.8V */
 				l23 {
 					regulator-always-on;
 					// ss?
@@ -241,39 +246,39 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 					bias-pull-down;
 				};
 
+				/* MEM 1.15V */
 				l24 {
 					// ss?
 					regulator-min-microvolt = <500000>;
 					regulator-max-microvolt = <1150000>;
 					bias-pull-down;
 
-					regulator-system-load = <10000>;
-					regulator-allow-set-load;
+					regulator-system-load = <10000>; //from nicki@Konrad
+					regulator-allow-set-load; //from nicki@Konrad
 				};
 
-				/*
+				/* PXO 1.05V */
 				l26 {
 					regulator-always-on;
 					regulator-min-microvolt = <1050000>;
 					regulator-max-microvolt = <1050000>;
 					bias-pull-down;
 				};
-				*/
 
-				/*
+				/* DSPAPP 1.05V */
 				l27 {
 					regulator-min-microvolt = <375000>;
 					regulator-max-microvolt = <1050000>;
 					bias-pull-down;
 				};
-				*/
 
+				/* Q-Fuse 1.8V */
 				lvs1 {
 					bias-pull-down;
 				};
 
 				lvs2 {
-					regulator-always-on; // accel + proxim, ts
+					regulator-always-on;
 					bias-pull-down;
 				};
 
@@ -288,6 +293,7 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 			};
 		};
 
+		/*
 		vsdcc_fixed: vsdcc-regulator {
 			compatible = "regulator-fixed";
 			regulator-name = "SDCC Power";
@@ -295,30 +301,24 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 			regulator-max-microvolt = <2700000>;
 			regulator-always-on;
 		};
-
-		/* touch screen reset gpio
-		driver doesnt use reset gpio so keep it on always */
-		touch_reset {
-			compatible = "regulator-fixed";
-			regulator-name = "touch_reset";
-			gpio = <&msmgpio 52 GPIO_ACTIVE_HIGH>;
-			enable-active-high;
-			regulator-always-on;
-		};
+		*/
 
 		amba {
 			/* eMMC */
+			/*
 			sdcc1: sdcc@12400000 {
 				status = "okay";
 				vmmc-supply = <&vsdcc_fixed>; //
 			};
+			*/
 		};
 
+#if 0
 		gpu: adreno-3xx@4300000 {
 			compatible =  "qcom,adreno-305.2", "qcom,adreno"; // or .0 ?
 			reg = <0x04300000 0x20000>;
 			reg-names = "kgsl_3d0_reg_memory";
-			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
+			interrupts = <GIC_SPI 80 0>;
 			interrupt-names = "kgsl_3d0_irq";
 			clock-names =
 			    "core_clk",
@@ -331,6 +331,7 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 			    <&mmcc GFX3D_AXI_CLK>,
 			    <&mmcc MMSS_IMEM_AHB_CLK>;
 
+#if 1
 			iommus = <&gfx3d 0
 				  &gfx3d 1
 				  &gfx3d 2
@@ -363,6 +364,7 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 				  &gfx3d 29
 				  &gfx3d 30
 				  &gfx3d 31>;
+#endif
 
 			qcom,gpu-pwrlevels {
 				compatible = "qcom,gpu-pwrlevels";
@@ -385,7 +387,7 @@ missing: https://gitlab.com/postmarketOS/pmaports/issues/184
 			label = "MDSS DSI CTRL->0";
 			#address-cells = <1>;
 			#size-cells = <0>;
-			interrupts = <GIC_SPI 82 IRQ_TYPE_LEVEL_HIGH>;
+			interrupts = <GIC_SPI 82 0>;
 			reg = <0x04700000 0x200>;
 			reg-names = "dsi_ctrl";
 
@@ -454,7 +456,7 @@ afab: 533000000
 				<0x04700300 0x200>,
 				<0x04700500 0x5c>;
 			reg-names = "dsi_pll", "dsi_phy", "dsi_phy_regulator";
-			clock-names = "iface";
+			clock-names = "iface_clk";
 			clocks = <&mmcc DSI_M_AHB_CLK>;
 		};
 
@@ -474,9 +476,12 @@ afab: 533000000
 				      "lut_clk",
 				      "hdmi_clk",
 				      "tv_clk";
-
-                        iommus = <&mdp_port0 0
-                                  &mdp_port0 2>;
+#if 1
+			iommus = <&mdp_port0 0
+				  &mdp_port0 2
+				  &mdp_port1 0
+				  &mdp_port1 2>;
+#endif
 
 			ports {
 				#address-cells = <1>;
@@ -528,7 +533,7 @@ afab: 533000000
 
 			panel@0 {
 				reg = <0>;
-				compatible = "panel-lvds";
+				compatible = "sharp,ls043t1le01-qhd";
 
 				reset-gpios = <&msmgpio 58 GPIO_ACTIVE_HIGH>;
 
@@ -562,7 +567,9 @@ afab: 533000000
 			status = "okay";
 			vddio-supply = <&pm8038_l23>;/*VDD_PLL2_1 to 7*/
 		};
+#endif
 
+#if 1
 		mdp_port0: iommu@7500000 {
 			compatible = "qcom,apq8064-iommu";
 			#iommu-cells = <1>;
@@ -575,6 +582,22 @@ afab: 533000000
 			reg = <0x07500000 0x100000>;
 			interrupts =
 			    <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
+			qcom,ncb = <2>;
+		};
+
+		mdp_port1: iommu@7600000 {
+			compatible = "qcom,apq8064-iommu";
+			#iommu-cells = <1>;
+			clock-names =
+			    "smmu_pclk",
+			    "iommu_clk";
+			clocks =
+			    <&mmcc SMMU_AHB_CLK>,
+			    <&mmcc MDP_AXI_CLK>;
+			reg = <0x07600000 0x100000>;
+			interrupts =
+			    <GIC_SPI 61 0>,
+			    <GIC_SPI 62 0>;
 			qcom,ncb = <2>;
 		};
 
@@ -592,13 +615,27 @@ afab: 533000000
 			    <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH>;
 			qcom,ncb = <3>;
 		};
+#endif
 
+		usb@12500000 {
+			status = "okay";
+			dr_mode = "otg";
+			ulpi {
+				phy {
+					v3p3-supply = <&pm8038_l3>;
+					v1p8-supply = <&pm8038_l4>;
+				};
+			};
+		};
+
+#if 1
 		riva-pil@3204000 {
 			status = "okay";
 
 			pinctrl-names = "default";
 			pinctrl-0 = <&riva_wlan_pin_a>, <&riva_bt_pin_a>, <&riva_fm_pin_a>;
 		};
+#endif
 
 #if 0
 		camss: camss@4500000 {
@@ -695,19 +732,9 @@ afab: 533000000
 			};
 		};
 #endif
-	};
+    };
 
-	/* regulators {
-		compatible = "simple-bus";
-
-		ext_l2: gpio-regulator@91 {
-			compatible = "regulator-fixed";
-			regulator-name = "ext_l2";
-			gpio = <&msmgpio 91 0>;
-			startup-delay-us = <10000>;
-			enable-active-high;
-		};
-	}; */
+        //gsbi@16400000 {}; //for some reason I have turned this on in the old port
 };
 
 &msmgpio {
@@ -731,14 +758,17 @@ afab: 533000000
 		};
 	};
 
+	/*
 	ps_hold: ps_hold {
 		mux {
 			pins = "gpio108";
 			function = "ps_hold";
         };
     };
+	*/
     
-    	pmic_int: pmic_int {
+	/*
+    pmic_int: pmic_int {
 		irq {
 			pins = "gpio104";
 			function = "gpio";
@@ -748,6 +778,7 @@ afab: 533000000
 			
 		};
 	};
+	*/
 
 	riva_fm_pin_a: riva-fm-active {
 		pins = "gpio26", "gpio27";
@@ -765,209 +796,5 @@ afab: 533000000
 
 		drive-strength = <6>;
 		bias-pull-down;
-	};
-
-	i2c3_pins: i2c3 {
-		mux {
-			pins = "gpio16", "gpio17";
-			function = "gsbi3";
-		};
-
-		pinconf {
-			pins = "gpio16", "gpio17";
-			drive-strength = <16>;
-			bias-disable;
-		};
-	};
-
-	i2c3_pins_sleep: i2c3_pins_sleep {
-		mux {
-			pins = "gpio16", "gpio17";
-			function = "gpio";
-		};
-		pinconf {
-			pins = "gpio16", "gpio17";
-			drive-strength = <2>;
-			bias-disable = <0>;
-		};
-	};
-
-	i2c4_pins: i2c4 {
-		mux {
-			pins = "gpio20", "gpio21";
-			function = "gsbi4";
-		};
-
-		pinconf {
-			pins = "gpio20", "gpio21";
-			drive-strength = <16>;
-			bias-disable;
-		};
-	};
-
-	i2c4_pins_sleep: i2c4_pins_sleep {
-		mux {
-			pins = "gpio20", "gpio21";
-			function = "gpio";
-		};
-		pinconf {
-			pins = "gpio20", "gpio21";
-			drive-strength = <2>;
-			bias-disable = <0>;
-		};
-	};
-
-	i2c12_pins: i2c12 {
-		mux {
-			pins = "gpio44", "gpio45";
-			function = "gsbi12";
-		};
-
-		pinconf {
-			pins = "gpio44", "gpio45";
-			drive-strength = <16>;
-			bias-disable;
-		};
-	};
-
-	i2c12_pins_sleep: i2c4_pins_sleep {
-		mux {
-			pins = "gpio44", "gpio45";
-			function = "gsbi12";
-		};
-		pinconf {
-			pins = "gpio44", "gpio45";
-			drive-strength = <2>;
-			bias-disable = <0>;
-		};
-	};
-
-	apds_pins: apds_pins {
-		irq {
-			pins = "gpio49";
-			function = "gpio";
-
-			drive-strength = <2>;
-			bias-pull-up;
-		};
-	};
-
-	kxtnk_pins: kxtnk_pins {
-		irq {
-			pins = "gpio46", "gpio67";
-			function = "gpio";
-
-			drive-strength = <2>;
-			bias-pull-down;
-		};
-	};
-
-	panel_pins: panel_pins {
-		reset {
-			pins = "gpio58";
-			function = "gpio";
-			drive-strength = <2>;
-			bias-disable;
-		};
-	};
-
-	touch_pins: touch_pins {
-		reset {
-			pins = "gpio52";
-			function = "gpio";
-			drive-strength = <2>;
-			bias-disable;
-		};
-
-		irq {
-			pins = "gpio11";
-			function = "gpio";
-			drive-strength = <2>;
-			bias-disable;
-		};
-	};
-
-};
-
-
-&gsbi3 {
-	status = "okay";
-	qcom,crci = <GSBI_CRCI_QUP>;
-	qcom,mode = <GSBI_PROT_I2C>;
-};
-
-&gsbi4 {
-	status = "okay";
-	qcom,crci = <GSBI_CRCI_QUP>;
-	qcom,mode = <GSBI_PROT_I2C>;
-};
-
-&gsbi12 {
-	status = "okay";
-	qcom,crci = <GSBI_CRCI_QUP>;
-	qcom,mode = <GSBI_PROT_I2C>;
-};
-
-&gsbi3_i2c {
-	clock-frequency = <400000>;
-	qcom,src-freq = <24000000>;
-
-	synaptics@4b {
-		compatible = "syna,rmi4-i2c";
-		reg = <0x4b>;
-
-		interrupts-extended = <&msmgpio 11 IRQ_TYPE_EDGE_FALLING>;
-		vdd-supply = <&pm8038_l9>;
-		vio-supply = <&pm8038_lvs2>;
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&touch_pins>;
-
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		rmi4-f01@1 {
-			reg = <0x1>;
-			syna,nosleep-mode = <1>;
-		};
-
-		rmi4-f11@11 {
-			reg = <0x11>;
-			syna,sensor-type = <1>;
-		};
-	};
-};
-
-
-&gsbi4_i2c {
-	// cam: front, back, flash,
-};
-
-&gsbi12_i2c {
-	kxtnk@1e {
-		compatible = "kionix,kxcnl1010";
-		reg = <0x1e>;
-
-		interrupts-extended = <&msmgpio 46 IRQ_TYPE_EDGE_FALLING>,
-						      <&msmgpio 67 IRQ_TYPE_EDGE_FALLING>;
-
-		vdd-supply = <&pm8038_l9>;
-		vio-supply = <&pm8038_lvs2>;
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&kxtnk_pins>;
-	};
-
-	apds@39 {
-		compatible = "avago,apds990x";
-		reg = <0x39>;
-
-		interrupts-extended = <&msmgpio 49 IRQ_TYPE_EDGE_FALLING>;
-		vdd-supply = <&pm8038_l9>;
-		vled-supply = <&pm8038_l9>;
-		// pm8038_lvs2 effect ?
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&apds_pins>;
 	};
 };
